@@ -20,11 +20,12 @@ const RowStyled = styled(Row)`
 `
 
 const fbProvider = new firebase.auth.FacebookAuthProvider()
+const googleProvider = new firebase.auth.GoogleAuthProvider()
 
 function Login(props) {
-  const handleFbLogin = async () => {
-    // connect login FB và add dự liệu
-    const { additionalUserInfo, user } = await auth.signInWithPopup(fbProvider)
+  const handleFbLogin = async (provider) => {
+    // connect login FB,GG và add dự liệu
+    const { additionalUserInfo, user } = await auth.signInWithPopup(provider)
     if (additionalUserInfo?.isNewUser) {
       addDocument('users', {
         displayName: user.displayName,
@@ -32,7 +33,7 @@ function Login(props) {
         photoURL: user.photoURL,
         uid: user.uid,
         providerId: user.providerId,
-        keywords: generateKeywords(user.displayName.toLowerCase())
+        keywords: generateKeywords(user.displayName?.toLowerCase())
       })
     }
   }
@@ -43,8 +44,20 @@ function Login(props) {
         <Title level={3} className="login__title">
           Fun Chat
         </Title>
-        <Button>Đăng nhập bằng Google</Button>
-        <Button onClick={handleFbLogin}>Đăng nhập bằng Facebook</Button>
+        <Button
+          onClick={() => {
+            handleFbLogin(googleProvider)
+          }}
+        >
+          Đăng nhập bằng Google
+        </Button>
+        <Button
+          onClick={() => {
+            handleFbLogin(fbProvider)
+          }}
+        >
+          Đăng nhập bằng Facebook
+        </Button>
       </Col>
     </RowStyled>
   )

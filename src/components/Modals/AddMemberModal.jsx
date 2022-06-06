@@ -14,13 +14,13 @@ function DebounceSelect({ fetchOptions, debounceTimeout = 300, ...props }) {
       setOptions([])
       setFetching(true)
 
-      fetchOptions(value, props.curMembers).then((newOptions) => {
+      fetchOptions(value, props.curmembers).then((newOptions) => {
         setOptions(newOptions)
         setFetching(false)
       })
     }
     return debounce(loadOptions, debounceTimeout)
-  }, [debounceTimeout, fetchOptions, props.curMembers])
+  }, [debounceTimeout, fetchOptions, props.curmembers])
   return (
     <Select
       filterOption={false}
@@ -29,8 +29,8 @@ function DebounceSelect({ fetchOptions, debounceTimeout = 300, ...props }) {
       notFoundContent={fetching ? <Spin size="small" /> : null}
       {...props}
     >
-      {options?.map((opt) => (
-        <Select.Option key={opt.value} value={opt.value} title={opt.label}>
+      {options?.map((opt, ind) => (
+        <Select.Option key={opt.value} value={opt.value}>
           <Avatar src={opt.photoURL} size="small">
             {opt.photoURL ? '' : opt.label?.charAt(0).toUpperCase()}
           </Avatar>
@@ -45,6 +45,7 @@ function AddMemberModal(props) {
   const { isAddMemberVisible, setIsAddMemberVisible, selectedRoom } = React.useContext(AppContext)
   const [form] = Form.useForm()
   const [value, setValue] = React.useState([])
+
   const handleOk = () => {
     form.resetFields()
     // lấy ra rooms có id = selectedRoom.id
@@ -66,16 +67,17 @@ function AddMemberModal(props) {
       .orderBy('displayName')
       .limit(20)
       .get()
-      .then((snapshot, curMembers) => {
+      .then((snapshot, curmembers) => {
         return snapshot.docs
           .map((doc) => ({
             label: doc.data().displayName,
             value: doc.data().uid,
             photoURL: doc.data().photoURL
           }))
-          .filter((opt) => !curMembers?.includes(opt.value))
+          .filter((opt) => !curmembers?.includes(opt.value))
       })
   }
+  console.log('selectedRoom', selectedRoom)
 
   return (
     <Modal
@@ -93,7 +95,7 @@ function AddMemberModal(props) {
           fetchOptions={fetchUserList}
           onChange={(newValue) => setValue(newValue)}
           style={{ width: '100%' }}
-          curMembers={selectedRoom.members}
+          curmembers={selectedRoom?.members}
         />
       </Form>
     </Modal>

@@ -30,6 +30,7 @@ const GroupAvatarStyles = styled.div`
 
 function ChatHeader(props) {
   const { selectedRoom, members, setIsAddMemberVisible } = React.useContext(AppContext)
+  console.log(members)
   return (
     <HeaderStyles>
       <div className="header__info">
